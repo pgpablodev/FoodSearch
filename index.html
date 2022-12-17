@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>FoodSearch</title>
+</head>
+<body>
+    <main class="container">
+        <div style="text-align: center;">
+            <p style="margin: 0;">Languages</p>
+            <div id="languages" class="grid">
+                <div id="es"></div>
+                <div id="en"></div>
+            </div> 
+        </div>
+        <div class="grid">
+            <div id="title"><h1>FoodSearch</h1></div>
+            <div></div>
+            <div></div>
+            <div id="switch-container">
+                <label id="switch" class="switch">
+                    <input type="checkbox" onchange="toggleTheme()" id="slider">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>               
+        <form id="form">
+            <label>
+                Food
+                <input required id="input" type="text" placeholder="Search any food">
+                <small>For instance: chicken thigh. Portions shown are always 100 g (or 100 ml)</small>
+            </label>
+            <button id="btn">
+                Get nutrition data
+            </button>
+        </form>
+
+        <div id="results" style="text-align: center; margin-top: 100px;">
+
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
