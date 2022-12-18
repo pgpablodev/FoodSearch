@@ -28,12 +28,49 @@ const results = document.getElementById('results')
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    const value = input.value
+    let value = input.value
     if(!value) return
+
+    let esValue = ""
+
+    if(locale==="es"){
+        esValue = value
+
+        const encodedParams = new URLSearchParams()
+        encodedParams.append("source", "es")
+        encodedParams.append("target", "en")
+        encodedParams.append("q", value)
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Accept-Encoding': 'application/gzip',
+                'X-RapidAPI-Key': '4caae5832dmshc8cc301c940600ep172f96jsncdc7d0d18813',
+                'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+            },
+            body: encodedParams
+        }
+
+        const translatedValue = await fetch('https://google-translate1.p.rapidapi.com/language/translate/v2', options)
+            .then(response => response.json())
+            .catch(err => console.error(err))
+        
+        if(translatedValue.message===exceeded){
+            results.innerHTML = `<h3>Aplicación saturada debido al límite mensual de traducciones.</h3><h3>Prueba la versión en inglés.</h3>`
+        }
+
+        if(translatedValue)
+            value = translatedValue.data.translations[0].translatedText        
+    }
 
     btn.setAttribute('disabled','disabled')
     btn.setAttribute('aria-busy','true')
-    btn.innerText = "Searching..."
+
+    if(locale==="en")
+        btn.innerText = "Searching..."
+    else if(locale==="es")
+        btn.innerText = "Buscando..."
 
     const foodInfo = await fetch('https://api.edamam.com/api/food-database/v2/parser?app_id=e7ec980c&app_key=e8facc8d7d04b8e6bf1793c3dc391aed&ingr='+value+'&nutrition-type=cooking')
                     .then(response => response.json())
@@ -43,7 +80,11 @@ form.addEventListener('submit', async (e) => {
         try{    
             input.value = ""   
             results.innerHTML = ""
-            results.innerHTML=('<h1>'+foodInfo.parsed[0].food.label+'</h1>')
+            if(locale==="en"){
+                results.innerHTML=('<h1>'+foodInfo.parsed[0].food.label+'</h1>')
+            }else if(locale==="es"){
+                results.innerHTML=('<h1>'+esValue +'</h1>')
+            }
 
             let kcal = foodInfo.parsed[0].food.nutrients.ENERC_KCAL
             let carb = foodInfo.parsed[0].food.nutrients.CHOCDF
@@ -58,38 +99,73 @@ form.addEventListener('submit', async (e) => {
             if(kcAlc>7){
                 let alc = kcAlc/7
 
-                results.innerHTML+=
-                (`<div class="grid">
-                    <hgroup>
-                        <h4>${kcal} kcal</h4>
-                        <h6>Energy Value</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #f74b7b">${carb} g</h4>
-                        <h6 style="color: #af9199">Carbohydrates</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #ffb725">${fat} g</h4>
-                        <h6 style="color: #a4977e">Fats</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #4d7bf3">${prot} g</h4>
-                        <h6 style="color: #9199ae">Proteins</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4>${alc.toFixed(2)} g</h4>
-                        <h6>Alcohol</h6>
-                    </hgroup>
-                </div>`)
+                if(locale==="en"){
+                    results.innerHTML+=
+                    (`<div class="grid">
+                        <hgroup>
+                            <h4>${kcal} kcal</h4>
+                            <h6>Energy Value</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #f74b7b">${carb} g</h4>
+                            <h6 style="color: #af9199">Carbohydrates</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #ffb725">${fat} g</h4>
+                            <h6 style="color: #a4977e">Fats</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #4d7bf3">${prot} g</h4>
+                            <h6 style="color: #9199ae">Proteins</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4>${alc.toFixed(2)} g</h4>
+                            <h6>Alcohol</h6>
+                        </hgroup>
+                    </div>`)
 
-                results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
+                    results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
+                }else if(locale==="es"){
+                    results.innerHTML+=
+                    (`<div class="grid">
+                        <hgroup>
+                            <h4>${kcal} kcal</h4>
+                            <h6>Valor energético</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #f74b7b">${carb} g</h4>
+                            <h6 style="color: #af9199">Carbohidratos</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #ffb725">${fat} g</h4>
+                            <h6 style="color: #a4977e">Grasas</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #4d7bf3">${prot} g</h4>
+                            <h6 style="color: #9199ae">Proteínas</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4>${alc.toFixed(2)} g</h4>
+                            <h6>Alcohol</h6>
+                        </hgroup>
+                    </div>`)
 
-                let canvas = document.createElement("canvas")    
+                    results.innerHTML += "<h3 style='margin-top: 100px'>Desglose % kcal</h3>"
+                }                
+
+                let canvas = document.createElement("canvas")   
+                
+                let tags = []
+
+                if(locale==="en")
+                    tags = ['Carbs', 'Fats', 'Prots', 'Alcohol']
+                else if(locale==="es")
+                    tags = ['Carbos', 'Grasas', 'Protes', 'Alcohol']
             
                 new Chart(canvas, {
                     type: 'doughnut',
                     data: {
-                    labels: ['Carbs', 'Fats', 'Prots', 'Alcohol'],
+                    labels: tags,
                     datasets: [{
                         label: '%',
                         data: [(kcCarb/kcal)*100, (kcFat/kcal)*100, (kcProt/kcal)*100, (kcAlc/kcal)*100],
@@ -101,34 +177,65 @@ form.addEventListener('submit', async (e) => {
 
                 results.appendChild(canvas)
             }else{
-                results.innerHTML+=
-                (`<div class="grid">
-                    <hgroup>
-                        <h4>${kcal} kcal</h4>
-                        <h6>Energy Value</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #f74b7b">${carb} g</h4>
-                        <h6 style="color: #af9199">Carbohydrates</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #ffb725">${fat} g</h4>
-                        <h6 style="color: #a4977e">Fats</h6>
-                    </hgroup>
-                    <hgroup>                
-                        <h4 style="color: #4d7bf3">${prot} g</h4>
-                        <h6 style="color: #9199ae">Proteins</h6>
-                    </hgroup>
-                </div>`)
+                if(locale==="en"){
+                    results.innerHTML+=
+                    (`<div class="grid">
+                        <hgroup>
+                            <h4>${kcal} kcal</h4>
+                            <h6>Energy Value</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #f74b7b">${carb} g</h4>
+                            <h6 style="color: #af9199">Carbohydrates</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #ffb725">${fat} g</h4>
+                            <h6 style="color: #a4977e">Fats</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #4d7bf3">${prot} g</h4>
+                            <h6 style="color: #9199ae">Proteins</h6>
+                        </hgroup>
+                    </div>`)
 
-                results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
+                    results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
+                }else if(locale==="es"){
+                    results.innerHTML+=
+                    (`<div class="grid">
+                        <hgroup>
+                            <h4>${kcal} kcal</h4>
+                            <h6>Valor energético</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #f74b7b">${carb} g</h4>
+                            <h6 style="color: #af9199">Carbohidratos</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #ffb725">${fat} g</h4>
+                            <h6 style="color: #a4977e">Grasas</h6>
+                        </hgroup>
+                        <hgroup>                
+                            <h4 style="color: #4d7bf3">${prot} g</h4>
+                            <h6 style="color: #9199ae">Proteínas</h6>
+                        </hgroup>
+                    </div>`)
 
-                let canvas = document.createElement("canvas")    
+                    results.innerHTML += "<h3 style='margin-top: 100px'>Desglose % kcal</h3>"
+                }   
+
+                let canvas = document.createElement("canvas")
+                
+                let tags = []
+
+                if(locale==="en")
+                    tags = ['Carbs', 'Fats', 'Prots']
+                else if(locale==="es")
+                    tags = ['Carbos', 'Grasas', 'Protes']
             
                 new Chart(canvas, {
                     type: 'doughnut',
                     data: {
-                    labels: ['Carbs', 'Fats', 'Prots'],
+                    labels: tags,
                     datasets: [{
                         label: '%',
                         data: [(kcCarb/kcal)*100, (kcFat/kcal)*100, (kcProt/kcal)*100],
@@ -141,22 +248,33 @@ form.addEventListener('submit', async (e) => {
                 results.appendChild(canvas)
             }
         }catch(e){
-            input.value = ""   
-            results.innerHTML = "<h3> Food \"" +value +"\" not found.</h3>"
+            input.value = ""            
+            if(locale==="en")
+                results.innerHTML = "<h3> Food \"" +value +"\" not found.</h3>"
+            else if(locale==="es")
+                results.innerHTML = "<h3> Alimento \"" +esValue +"\" no encontrado.</h3>"
         }    
     }else{
         input.value = ""   
-        results.innerHTML = "<h3>An error has occurred.</h3>"
+        if(locale==="en")
+            results.innerHTML = "<h3>An error has occurred.</h3>"
+        else if(locale==="es")
+            results.innerHTML = "<h3>Se ha producido un error.</h3>"
     }
 
-    btn.innerText = "Get nutrition data"
+    if(locale==="en")
+        btn.innerText = "Get nutrition data"
+    else if(locale==="es")
+        btn.innerText = "Mostrar la información"
     btn.removeAttribute('disabled','')
     btn.removeAttribute('aria-busy')
 })
 
 //Language code
 
-const defaultLocale = "en"
+let exceeded = "You have exceeded the MONTHLY quota for Characters on your current plan, BASIC. Upgrade your plan at https://rapidapi.com/googlecloud/api/google-translate1"
+
+const defaultLocale = navigator.language.slice(0,2)
 
 let locale
 
@@ -201,6 +319,8 @@ function bindLocaleSwitcher(initialValue){
     for(const sw of switcher){
         sw.addEventListener('click', () => {
             setLocale(sw.id)
+            input.value = ""
+            results.innerHTML = ""
         })
     }
 }

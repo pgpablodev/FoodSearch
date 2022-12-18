@@ -2,7 +2,6 @@
     "languages-title": "Idiomas",
     "title": "FoodSearch",
     "food": "Alimento",
-    "[html]input": "<input required id=\"input\" type=\"text\" placeholder=\"Busca cualquier alimento\" data-i18n-key=\"[html]input\">",
     "example": "Por ejemplo: contramuslo de pollo. Los resultados se corresponden con 100 g (o 100 ml)",
-    "btn": "Muestra la información"
+    "btn": "Mostrar la información"
 }

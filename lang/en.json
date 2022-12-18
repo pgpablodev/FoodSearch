@@ -2,7 +2,6 @@
     "languages-title": "Languages",
     "title": "FoodSearch",
     "food": "Food",
-    "[html]input": "<input required id=\"input\" type=\"text\" placeholder=\"Search any food\" data-i18n-key=\"[html]input\">",
     "example": "For instance: chicken thigh. Portions shown are always 100 g (or 100 ml)",
     "btn": "Get nutrition data"
 }
