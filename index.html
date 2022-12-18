@@ -11,14 +11,14 @@
 <body>
     <main class="container">
         <div style="text-align: center;">
-            <p style="margin: 0;">Languages</p>
+            <p style="margin: 0;" data-i18n-key="languages-title">Languages</p>
             <div id="languages" class="grid">
                 <div id="es"></div>
                 <div id="en"></div>
             </div> 
         </div>
         <div class="grid">
-            <div id="title"><h1>FoodSearch</h1></div>
+            <div><h1 data-i18n-key="title" id="title">FoodSearch</h1></div>
             <div></div>
             <div></div>
             <div id="switch-container">
@@ -30,11 +30,11 @@
         </div>               
         <form id="form">
             <label>
-                Food
-                <input required id="input" type="text" placeholder="Search any food">
-                <small>For instance: chicken thigh. Portions shown are always 100 g (or 100 ml)</small>
+                <span data-i18n-key="food">Food</span>
+                <input required id="input" type="text" placeholder="Search any food" data-i18n-key="[html]input">
+                <small data-i18n-key="example">For instance: chicken thigh. Portions shown are always 100 g (or 100 ml)</small>
             </label>
-            <button id="btn">
+            <button id="btn" data-i18n-key="btn">
                 Get nutrition data
             </button>
         </form>

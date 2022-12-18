@@ -40,7 +40,7 @@ html{
 }
 #languages > div:hover{
     filter: brightness(105%);
-    background-size: 175%;
+    background-size: 200%;
     transition: all .2s;
 }
 #languages > div:active{

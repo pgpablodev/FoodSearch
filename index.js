@@ -1,8 +1,25 @@
+//Dark or light theme detection on user machine, this way the slider will be on its proper position.
+//Only used for the slider, picocss already detects it and loads the preferred color scheme.
+
 let mode = "dark"
 if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
     mode = "light"
     document.getElementById("slider").checked = true
 }
+
+//Code for theme toggling via slider
+
+function toggleTheme(){
+    if(mode==="dark"){
+        document.body.parentNode.setAttribute("data-theme","light")
+        mode = "light"
+    }else if(mode==="light"){
+        document.body.parentNode.setAttribute("data-theme","dark")
+        mode = "dark"
+    }
+}
+
+//Code for app functionality
 
 const form = document.getElementById('form')
 const input = document.getElementById('input')
@@ -20,7 +37,7 @@ form.addEventListener('submit', async (e) => {
 
     const foodInfo = await fetch('https://api.edamam.com/api/food-database/v2/parser?app_id=e7ec980c&app_key=e8facc8d7d04b8e6bf1793c3dc391aed&ingr='+value+'&nutrition-type=cooking')
                     .then(response => response.json())
-                    .catch(err => console.error(err));
+                    .catch(err => console.error(err))
 
     if(foodInfo){ 
         try{    
@@ -65,7 +82,7 @@ form.addEventListener('submit', async (e) => {
                     </hgroup>
                 </div>`)
 
-                results.innerHTML += "<h3 style='margin-top: 100px;'>kcal % breakdown</h3>"
+                results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
 
                 let canvas = document.createElement("canvas")    
             
@@ -104,7 +121,7 @@ form.addEventListener('submit', async (e) => {
                     </hgroup>
                 </div>`)
 
-                results.innerHTML += "<h3 style='margin-top: 100px;'>kcal % breakdown</h3>"
+                results.innerHTML += "<h3 style='margin-top: 100px'>kcal % breakdown</h3>"
 
                 let canvas = document.createElement("canvas")    
             
@@ -137,12 +154,53 @@ form.addEventListener('submit', async (e) => {
     btn.removeAttribute('aria-busy')
 })
 
-function toggleTheme(){
-    if(mode==="dark"){
-        document.body.parentNode.setAttribute("data-theme","light")
-        mode = "light"
-    }else if(mode==="light"){
-        document.body.parentNode.setAttribute("data-theme","dark")
-        mode = "dark"
+//Language code
+
+const defaultLocale = "en"
+
+let locale
+
+let translations = {}
+
+document.addEventListener("DOMContentLoaded", () => {
+    setLocale(defaultLocale)
+    bindLocaleSwitcher(defaultLocale)
+})
+
+function translateElement(element){
+    const key = element.getAttribute("data-i18n-key")
+    const translation = translations[locale][key]
+    element.innerText = translation
+}
+
+async function setLocale(newLocale){
+    if(newLocale===locale) return
+    const newTranslations = await fetchTranslationsFor(newLocale)
+    locale = newLocale
+    translations = newTranslations
+    translatePage()
+}
+
+async function fetchTranslationsFor(newLocale){
+    const response = await fetch(`/lang/${newLocale}.json`)
+    return await response.json()
+}
+
+function translatePage(){
+    document.querySelectorAll("[data-i18n-key]").forEach(translateElement)
+}
+
+function translateElement(element){
+    const key = element.getAttribute("data-i18n-key")
+    const translation = translations[key]
+    element.innerText = translation
+}
+
+function bindLocaleSwitcher(initialValue){
+    const switcher = document.getElementById("languages").children
+    for(const sw of switcher){
+        sw.addEventListener('click', () => {
+            setLocale(sw.id)
+        })
     }
 }
