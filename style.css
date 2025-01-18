@@ -59,7 +59,7 @@ html{
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
+    width: 70px !important;
     height: 34px;
   }
   
@@ -111,9 +111,9 @@ html{
   }
   
   input:checked + .slider:before {
-    -webkit-transform: translateX(24px);
-    -ms-transform: translateX(24px);
-    transform: translateX(24px);
+    -webkit-transform: translateX(32px);
+    -ms-transform: translateX(32px);
+    transform: translateX(32px);
     background: white url('svg/sun-solid.svg');
     background-repeat: no-repeat;
     background-position: center;

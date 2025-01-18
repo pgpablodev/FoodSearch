@@ -36,32 +36,31 @@ form.addEventListener('submit', async (e) => {
     if(locale==="es"){
         esValue = value
 
-        const encodedParams = new URLSearchParams()
-        encodedParams.append("source", "es")
-        encodedParams.append("target", "en")
-        encodedParams.append("q", value)
-
+        const url = 'https://google-translate113.p.rapidapi.com/api/v1/translator/html';
         const options = {
             method: 'POST',
             headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                'Accept-Encoding': 'application/gzip',
-                'X-RapidAPI-Key': '4caae5832dmshc8cc301c940600ep172f96jsncdc7d0d18813',
-                'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+                'x-rapidapi-key': '4caae5832dmshc8cc301c940600ep172f96jsncdc7d0d18813',
+                'x-rapidapi-host': 'google-translate113.p.rapidapi.com',
+                'Content-Type': 'application/json'
             },
-            body: encodedParams
-        }
+            body: JSON.stringify({
+                from: 'es',
+                to: 'en',
+                html: esValue,
+            })
+        };
 
-        const translatedValue = await fetch('https://google-translate1.p.rapidapi.com/language/translate/v2', options)
-            .then(response => response.json())
-            .catch(err => console.error(err))
-        
-        if(translatedValue.message===exceeded){
-            results.innerHTML = `<h3>Aplicación saturada debido al límite mensual de traducciones.</h3><h3>Prueba la versión en inglés.</h3>`
-        }
+        try {
+            const response = await fetch(url, options);
+            const result = await response.text();
 
-        if(translatedValue)
-            value = translatedValue.data.translations[0].translatedText        
+            if(result)
+                value = JSON.parse(result).trans;
+        } catch (error) {
+            results.innerHTML = `<h3>Aplicación saturada debido al límite mensual de traducciones.</h3><h3>Prueba la versión en inglés.</h3>`;
+            console.error(error);
+        }        
     }
 
     btn.setAttribute('disabled','disabled')
@@ -153,7 +152,7 @@ form.addEventListener('submit', async (e) => {
                     results.innerHTML += "<h3 style='margin-top: 100px'>Desglose % kcal</h3>"
                 }                
 
-                let canvas = document.createElement("canvas")   
+                let canvas = document.createElement("canvas");
                 
                 let tags = []
 
@@ -172,7 +171,7 @@ form.addEventListener('submit', async (e) => {
                         borderWidth: 1,
                         backgroundColor: ['#f74b7b', '#ffb725', '#4d7bf3', '#aaa']
                     }]
-                    }            
+                    }
                 })
 
                 results.appendChild(canvas)
